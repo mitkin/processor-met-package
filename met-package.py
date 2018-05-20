@@ -52,6 +52,21 @@ def get_ice_charts(output_dir, add_date=True):
                         basename + "_{}".format(time_str) + "." + e), 'wb') as f:
                 f.write(response.read())
 
+def create_logger(filepath, loglevel=logging.DEBUG):
+    global logger
+
+    logger = logging.getLogger('mapmaker')
+    logger.setLevel(loglevel)
+    formatter = logging.Formatter('%(asctime)s  %(name)s  %(levelname)s: %(message)s')
+
+    file_handler = logging.FileHandler(filepath)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+
 def main():
 
     p = argparse.ArgumentParser()
@@ -64,19 +79,7 @@ def main():
 
     args = p.parse_args()
 
-    global logger
-
-    logger = logging.getLogger('mapmaker')
-    logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s  %(name)s  %(levelname)s: %(message)s')
-
-    file_handler = logging.FileHandler(args.log_file)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
+    logger = create_logger(args.log_file)
 
     output_dir = args.output_file + '.d'
     try:
