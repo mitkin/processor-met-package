@@ -39,6 +39,8 @@ def get_ice_charts(output_dir, add_date=True):
         timestamp = datetime.datetime.strptime(date_str.split()[1], '%Y%m%d%H%M%S')
         time_str = datetime.datetime.strftime(timestamp, "%Y%m%d")
 
+        logger.info("Ice chart upload date: {}".format(time_str))
+
         for e in exts:
             response = request.urlopen("ftp://{}/{}/{}.{}".format(
                 hostname,
@@ -62,6 +64,8 @@ def main():
 
     args = p.parse_args()
 
+    global logger
+
     logger = logging.getLogger('mapmaker')
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s  %(name)s  %(levelname)s: %(message)s')
@@ -82,8 +86,11 @@ def main():
 
     get_ice_charts(output_dir)
 
-    # if not args.keep_temporary:
-    #     os.rmdir(output_dir)
+    shutil.make_archive(os.path.splitext(args.output_file)[0], 'zip', output_dir)
+
+
+    if not args.keep_temporary:
+         shutil.rmtree(output_dir)
 
 if __name__ == "__main__":
     main()
