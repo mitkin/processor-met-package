@@ -57,6 +57,7 @@ def get_topaz_forecast(output_dir):
 
     outname = os.path.join(output_dir, 'topaz_{}.nc'.format(timestamp))
     xdst.to_netcdf(outname, engine='netcdf4', encoding=encoding)
+    logger.info("Obtained TOPAZ forecast")
 
 def get_weather_forecast(output_dir):
     forecast_url = "http://thredds.met.no/thredds/ncss/aromearcticlatest/arome_arctic_extracted_2_5km_latest.nc?var=air_temperature_2m&var=wind_direction&var=wind_speed&disableLLSubset=on&disableProjSubset=on&horizStride=6&time_start=2018-05-20T06%3A00%3A00Z&time_end=2018-05-25T00%3A00%3A00Z&timeStride=6&vertCoord=&addLatLon=true"
@@ -64,6 +65,7 @@ def get_weather_forecast(output_dir):
     fname = os.path.basename("weather-forecast.nc")
     with open(os.path.join(output_dir, fname), mode='wb') as f:
                 f.write(response.read())
+    logger.info("Obtained Arome Arctic forecast")
 
 def get_ice_charts(output_dir, add_date=True):
     """
@@ -95,6 +97,7 @@ def get_ice_charts(output_dir, add_date=True):
                         output_dir,
                         basename + "_{}".format(time_str) + "." + e), 'wb') as f:
                 f.write(response.read())
+        logger.info("Obtained Ice Chart")
 
 def create_logger(filepath, loglevel=logging.DEBUG):
     global logger
@@ -139,6 +142,7 @@ def main():
     shutil.make_archive(os.path.splitext(args.output_file)[0], 'zip', output_dir)
 
     if not args.keep_temporary:
+         logger.info("Removing tmp output directory {}".format(output_dir))
          shutil.rmtree(output_dir)
 
 if __name__ == "__main__":
