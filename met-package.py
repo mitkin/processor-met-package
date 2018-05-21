@@ -133,6 +133,7 @@ def main():
 
     create_logger(args.log_file)
 
+    logger.debug("Creating output dir")
     output_dir = args.output_file + '.d'
     try:
         os.mkdir(output_dir)
