@@ -1,4 +1,4 @@
-#!/home/mikhail/.virtualenvs/def36/bin/python
+#!/usr/bin/env python3
 
 import argparse
 import datetime
@@ -144,7 +144,9 @@ def main():
     get_weather_forecast(output_dir)
     get_topaz_forecast(output_dir)
 
+    # FIXME: Do cleaner work with output files naming
     shutil.make_archive(os.path.splitext(args.output_file)[0], 'zip', output_dir)
+    shutil.move(os.path.splitext(args.output_file)[0] + ".zip", args.output_file)
 
     if not args.keep_temporary:
          logger.info("Removing tmp output directory {}".format(output_dir))
