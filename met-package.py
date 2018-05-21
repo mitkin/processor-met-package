@@ -19,6 +19,8 @@ from io import StringIO
 import ftplib
 import netCDF4 as nc
 import xarray as xr
+from datetime import datetime as dt
+from datetime import timedelta 
 
 
 def get_topaz_forecast(output_dir):
@@ -44,7 +46,7 @@ def get_topaz_forecast(output_dir):
     ymax = 460
 
     varlist = "[0:1:3][240:1:460][280:1:420],".format(tdim, ydim, xdim).join(varnames)
-    varlist += "time[0:1:{}]".format(tdim)
+    varlist += "time[{}:1:{}]".format(tdim-10, tdim) # last 10 days
     varlist += ",latitude[240:1:460][280:1:420]"
     varlist += ",longitude[240:1:460][280:1:420]"
 
@@ -60,9 +62,12 @@ def get_topaz_forecast(output_dir):
     logger.info("Obtained TOPAZ forecast")
 
 def get_weather_forecast(output_dir):
-    forecast_url = "http://thredds.met.no/thredds/ncss/aromearcticlatest/arome_arctic_extracted_2_5km_latest.nc?var=air_temperature_2m&var=wind_direction&var=wind_speed&disableLLSubset=on&disableProjSubset=on&horizStride=6&time_start=2018-05-20T06%3A00%3A00Z&time_end=2018-05-25T00%3A00%3A00Z&timeStride=6&vertCoord=&addLatLon=true"
+    time_start = dt.utcnow().strftime("%Y-%m-%d")
+    days_delta = timedelta(days=3)
+    time_end =  (dt.utcnow() + days_delta).strftime("%Y-%m-%d")
+    forecast_url = "http://thredds.met.no/thredds/ncss/aromearcticlatest/arome_arctic_extracted_2_5km_latest.nc?var=air_temperature_2m&var=wind_direction&var=wind_speed&disableLLSubset=on&disableProjSubset=on&horizStride=6&time_start={}T06%3A00%3A00Z&time_end={}T00%3A00%3A00Z&timeStride=6&vertCoord=&addLatLon=true".format(time_start, time_end)
     response = request.urlopen(forecast_url)
-    fname = os.path.basename("weather-forecast.nc")
+    fname = os.path.basename("arome-forecast_{}.nc".format(time_start))
     with open(os.path.join(output_dir, fname), mode='wb') as f:
                 f.write(response.read())
     logger.info("Obtained Arome Arctic forecast")
